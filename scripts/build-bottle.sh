@@ -29,7 +29,11 @@ out="$HOME/builder-artifacts/$release"
 [ ! -e "$out" ] || { echo "Output already exists: $out (use new RELEASE_TAG)" >&2; exit 1; }
 mkdir -p "$out"
 
-"$brew" reinstall --build-bottle "$formula" < /dev/null
+# reinstall does not support --build-bottle. Remove only selected keg, then build.
+if "$brew" list --formula | grep -Fxq "$name"; then
+  "$brew" uninstall "$name" < /dev/null
+fi
+"$brew" install --build-bottle "$formula" < /dev/null
 "$brew" test "$formula" < /dev/null
 source_url=$(printf '%s' "$info" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["formulae"][0]["urls"]["stable"]["url"])')
 source_sha=$(printf '%s' "$info" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["formulae"][0]["urls"]["stable"]["checksum"])')

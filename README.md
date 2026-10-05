@@ -48,7 +48,8 @@ git merge --ff-only origin/main
 ```
 
 Script checks Intel/Ventura and pinned Brew commit, grants formula-specific trust,
-builds from source, runs formula test, downloads/checks corresponding source,
+removes only selected formula's existing keg, builds from source, runs formula
+test, downloads/checks corresponding source,
 bottles into `~/builder-artifacts/<release-tag>`, and updates bottle block without
 committing. Default timestamped tags keep assets immutable. `RELEASE_TAG` can be
 set explicitly for a first release; never overwrite published assets.
