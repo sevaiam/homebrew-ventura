@@ -35,6 +35,10 @@ if "$brew" list --formula | grep -Fxq "$name"; then
   "$brew" uninstall "$name" < /dev/null
 fi
 "$brew" install --build-bottle "$formula" < /dev/null
+# Bottle builds skip post-install; OpenSSL tests require configured CA bundle.
+if [ "$name" = openssl@3 ]; then
+  "$brew" postinstall "$formula" < /dev/null
+fi
 "$brew" test "$formula" < /dev/null
 source_url=$(printf '%s' "$info" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["formulae"][0]["urls"]["stable"]["url"])')
 source_sha=$(printf '%s' "$info" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["formulae"][0]["urls"]["stable"]["checksum"])')
