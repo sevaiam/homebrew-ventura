@@ -42,8 +42,10 @@ fi
 "$brew" test "$formula" < /dev/null
 source_url=$(printf '%s' "$info" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["formulae"][0]["urls"]["stable"]["url"])')
 source_sha=$(printf '%s' "$info" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["formulae"][0]["urls"]["stable"]["checksum"])')
-curl -fL --retry 2 "$source_url" -o "$out/$name-$version.source.tar.gz"
-printf '%s  %s\n' "$source_sha" "$out/$name-$version.source.tar.gz" | shasum -a 256 -c -
+source_ext=$(printf '%s' "$source_url" | /usr/bin/python3 -c 'import sys,urllib.parse; path=urllib.parse.urlsplit(sys.stdin.read()).path; print(next((ext for ext in [".tar.gz", ".tar.xz", ".tar.bz2", ".tgz", ".zip"] if path.endswith(ext)), ".archive"))')
+source_archive="$out/$name-$version.source$source_ext"
+curl -fL --retry 2 "$source_url" -o "$source_archive"
+printf '%s  %s\n' "$source_sha" "$source_archive" | shasum -a 256 -c -
 cd "$out"
 "$brew" bottle --no-rebuild --json --root-url="https://github.com/sevaiam/homebrew-ventura/releases/download/$release" "$formula" < /dev/null
 set -- "$out/$name"--*.bottle.json
