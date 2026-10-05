@@ -64,10 +64,24 @@ Builder has unchanged LLVM 18.1.8 `stdckdint.h` at
 Source: https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-18.1.8/clang/lib/Headers/stdckdint.h
 
 `~/.bundle/config` scopes private include path and macOS SDK path to native
-`bigdecimal` build. Initial bottle gems were installed directly with portable
-Ruby's Bundler and `BUNDLE_WITH=bottle`, since Brew sanitizes Bundler environment
-flags. No Homebrew source or system headers patched. This header is needed only
-for builder's Ruby tooling, not by Deus to pour bottles.
+`bigdecimal`, `prism` and `racc` builds. Bottle, test and AST/merge gems were installed
+directly with portable Ruby's Bundler, since Brew sanitizes Bundler environment
+flags. To repeat after placing the checked LLVM header:
+
+```sh
+cd "$(brew --repo)/Library/Homebrew"
+rubybin="$PWD/vendor/portable-ruby/4.0.7/bin"
+flags="--with-cflags=-I$HOME/builder-toolchain/llvm-18.1.8/include -isysroot $(xcrun --sdk macosx --show-sdk-path)"
+BUNDLE_WITH=bottle:formula_test:ast \
+  BUNDLE_BUILD__BIGDECIMAL="$flags" BUNDLE_BUILD__PRISM="$flags" BUNDLE_BUILD__RACC="$flags" \
+  "$rubybin/ruby" "$rubybin/bundle" install
+for gem in bigdecimal prism racc; do
+  "$rubybin/ruby" "$rubybin/bundle" config set --global "build.$gem" "$flags"
+done
+```
+
+No Homebrew source or system headers patched. Header is needed only for builder's
+Ruby tooling, not by Deus to pour bottles.
 
 ## Publish from maintainer machine
 

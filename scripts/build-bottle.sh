@@ -24,7 +24,8 @@ formula="sevaiam/ventura/$name"
 info=$("$brew" info --json=v2 "$formula")
 version=$(printf '%s' "$info" | /usr/bin/python3 -c 'import json,sys; f=json.load(sys.stdin)["formulae"][0]; print(f["versions"]["stable"] + ("_" + str(f["revision"]) if f["revision"] else ""))')
 release=${RELEASE_TAG:-$name-$version-$(date -u +%Y%m%dT%H%M%SZ)}
-case "$release" in *[!a-zA-Z0-9._-]*|"") echo 'Invalid release tag' >&2; exit 1;; esac
+case "$release" in *[!a-zA-Z0-9@+._-]*|"") echo 'Invalid release tag' >&2; exit 1;; esac
+git check-ref-format "refs/tags/$release"
 out="$HOME/builder-artifacts/$release"
 [ ! -e "$out" ] || { echo "Output already exists: $out (use new RELEASE_TAG)" >&2; exit 1; }
 mkdir -p "$out"

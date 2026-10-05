@@ -6,6 +6,11 @@ class Tree < Formula
   license "GPL-2.0-or-later"
   compatibility_version 1
 
+  bottle do
+    root_url "https://github.com/sevaiam/homebrew-ventura/releases/download/tree-2.3.2"
+    sha256 cellar: :any_skip_relocation, ventura: "60f0520ea31f96dd3ec4334683cef1fadf93a5eec26dbad6065ec6e00b89e3c1"
+  end
+
   deny_network_access!
 
   def install
